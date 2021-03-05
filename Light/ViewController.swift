@@ -14,48 +14,51 @@ class ViewController: UIViewController {
     var isTorch: Bool = true
     @IBOutlet weak var switchLight: UISegmentedControl!
     @IBOutlet weak var btnOnOff: UIButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
     }
     
     @IBAction func changeLight(_ sender: Any) {
-        
-        isTorch = switchLight.selectedSegmentIndex == 0
-        if isTorch
-        {
-            if self.view.backgroundColor == UIColor.black
-            {
-                btnOnOff.setTitle("ON", for: [])
-            }
-            else
-            {
-                btnOnOff.setTitle("OFF", for: [])
-            }
-        }
-        else
-        {
-            btnOnOff.setTitle("NEXT", for: [])
-        }
+        swLight()
     }
     
     @IBAction func changeOnOff(_ sender: Any) {
-        if isTorch
-        {
-            if btnOnOff.title(for: []) == "ON"
-            {
+        onOff()
+    }
+    // Change Light's type
+    func swLight(){
+        var btnText =  btnOnOff.title(for: [])
+        isTorch = switchLight.selectedSegmentIndex == 0
+        if isTorch {
+            self.view.backgroundColor = UIColor.black
+            btnText =  "ON"
+        }
+        else {
+            if btnText ==  "OFF"{
+                toggleFlash()
+            }
+            btnText =  "NEXT"
+            
+        }
+        btnOnOff.setTitle(btnText, for: [])
+    }
+    
+    // On/ Off torch or next color background
+    func onOff(){
+        if isTorch {
+            if btnOnOff.title(for: []) == "ON" {
                 btnOnOff.setTitle("OFF", for: [])
                 self.view.backgroundColor = UIColor.white
             }
-            else
-            {
+            else {
                 btnOnOff.setTitle("ON", for: [])
                 self.view.backgroundColor = UIColor.black
             }
             toggleFlash()
-         }
-        else
-        {
+        }
+        else {
             switch colorLight {
             case UIColor.red:
                 colorLight = UIColor.yellow
@@ -67,16 +70,18 @@ class ViewController: UIViewController {
             self.view.backgroundColor = colorLight
         }
     }
-    
+    // On/ Off device torch
     func toggleFlash() {
         let device = AVCaptureDevice.default(for: AVMediaType.video)
-        if (device!.hasTorch) {
-            do {
-                try
-                    device?.lockForConfiguration()
-                device?.torchMode = device?.torchMode == AVCaptureDevice.TorchMode.on ? .off: .on
-                device!.unlockForConfiguration()}
-            catch{}
+        if device != nil{
+            if (device!.hasTorch) {
+                do {
+                    try
+                        device?.lockForConfiguration()
+                    device?.torchMode = device?.torchMode == AVCaptureDevice.TorchMode.on ? .off: .on
+                    device!.unlockForConfiguration()}
+                catch{}
+            }
         }
     }
 }
